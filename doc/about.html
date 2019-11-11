@@ -2,8 +2,7 @@
 <ul>
 <li><b>Config Basics</b> tab: input parameters common to all models (e.g., domain grid, simulation time, choice/frequency of outputs)</li>
 <li><b>User Params</b> tab:&nbsp;&nbsp; input parameters that are model-specific</li>
-<li><b>Out: Cell Plots</b> tab:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output display of the cells</li>
-<li><b>Out: Substrate Plots</b> tab: output display of the substrates</li>
+<li><b>Out: Plots</b> tab:&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; output display of cells and substrates</li>
 </ul>
 Clicking the 'Run' button will use the specified parameters and start a simulation. When clicked, it creates an "Output" widget
 that can be clicked/expanded to reveal the progress (text) of the simulation. When the simulation generates output file(s),
@@ -160,14 +159,10 @@ detach from worker cells if <em>&sigma;</em> &lt; <em>&sigma;</em><sub>release</
 
 <h2><a id="instructions" name="instructions">Basic instructions</a></h2>
 
-<p>Modify the parameters in the &quot;config basics&quot; and &quot;user params&quot; tabs. Click the &quot;run&quot; button once ready.</p>
+<p>Modify the parameters in the &quot;Config Basics&quot; and &quot;User Params&quot; tabs. Click the &quot;Run&quot; button once ready.</p>
 
-<p>To view the cell plots, click the &quot;cell plots&quot; tab, and slide the bar to advance through simulation frames. 
-Note that as the simulation runs, the &quot;max&quot; field (maximum frame number) will increase, so you can view more simulation frames.</p>
-
-<p>To view the substrate fields, click the &quot;substrate plots&quot; tab, choose a substrate from the drop-down menu, 
-and slide through the saved times. Note that as the simulation runs, the &quot;max&quot; field (maximum frame number) will 
-increase, so you can view more simulation frames.</p>
+<p>To view the output results, click the &quot;Out:Plots&quot; tab, and click/drag the slider to advance through simulation frames. (You can also use the left/right arrow buttons to move the slider if it's selected.)
+Note that as the simulation runs, the &quot;max&quot; field (maximum frame number) will increase, so you can view more simulation frames. You can toggle on/off the display of either cells or substrates, assuming you selected them to be computed in the &quot;Config Basics&quot; tab. And you can select different substrates and different colormaps from the dropdown widgets.</p>
 
 <p>Note that you can download full simulation data for further exploration in your tools of choice.</p>
 
