@@ -22,8 +22,6 @@ cells and haul them to a destination), and director cells (which attract worker 
 
 <p>This app demonstrates how simple &quot;rules&quot; for three types of agents (biorobots)
     and two substrates (signals).
-for <em>active</em> delivery of therapeutic compounds, while overcoming traditional biotransport limits and using 
-hypoxia to target delivery. 
 
 <p>In this simulation, 
 <span style="font-weight: bold; color: red;">&quot;worker bots&quot; (red)</span> seek out 
@@ -55,16 +53,14 @@ slow its spread. These effects compete to determine the characteristic distance 
 
 <p>Choosing <em>D</em> and <em>&lambda;</em> can help to tune the chemical communication distance in these models.</p>
 
-<h3>Oxygen (<em>&sigma;</em>):</h3>
+<h3>Director signal:</h3>
 
-<p>This is released by the computational boundary (a simplified model of a far-field vasculature), and consumed by tumor cells.</p>
+<p>Director cells secrete a diffusible chemoattractant, but are otherwise stationary agents.
 
-<p>We use a far-field value of 38 mmHg (about 5%), which is a typical physioxic condition. See [1] and [2] for more ferences. 
-We use a length scale of 1000 &mu;m, and cancer cell uptake gives a length scale of 100 &mu;m in densely packed regions.</p>
+<h3>Cargo signal:</h3>
 
-<h3>Chemoattractant (<em>a</em>):</h3>
-
-<p>This factor is released by undocked cargo to help guide chemotaxis by the worker biorobots.</p>
+<p>Cargo cells secrete a diffusible chemoattractant.
+This factor is released by undocked cargo to help guide chemotaxis by the worker biorobots.</p>
 
 <p>The chemoattractant is nondimensionalized so that 0 &le; <em>a</em> &le; 1, and we initially assign a length scale of 100 &mu;m.</p>
 
