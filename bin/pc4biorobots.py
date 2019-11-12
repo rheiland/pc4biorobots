@@ -10,7 +10,7 @@ from about import AboutTab
 from config import ConfigTab
 from microenv_params import MicroenvTab
 from user_params import UserTab
-from svg import SVGTab
+# from svg import SVGTab
 from substrates import SubstrateTab
 from pathlib import Path
 import platform
@@ -42,7 +42,7 @@ tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of t
 xml_root = tree.getroot()
 microenv_tab = MicroenvTab()
 user_tab = UserTab()
-svg = SVGTab()
+# svg = SVGTab()
 sub = SubstrateTab()
 
 nanoHUB_flag = False
@@ -77,11 +77,11 @@ def read_config_cb(_b):
     
     # update visualization tabs
     if is_dir:
-        svg.update(read_config.value)
+        # svg.update(read_config.value)
         sub.update(read_config.value)
     else:  # may want to distinguish "DEFAULT" from other saved .xml config files
         # FIXME: really need a call to clear the visualizations
-        svg.update('')
+        # svg.update('')
         sub.update('')
         
 
@@ -197,7 +197,7 @@ def run_done_func(s, rdir):
     #     print('run_done_func: ---- after updating read_config.options')
 
     # and update visualizations
-    svg.update(rdir)
+    # svg.update(rdir)
     sub.update(rdir)
     # with debug_view:
     #     print('RDF DONE')
@@ -229,7 +229,7 @@ def run_sim_func(s):
 
     tdir = os.path.abspath('tmpdir')
     os.chdir(tdir)  # operate from tmpdir; temporary output goes here.  may be copied to cache later
-    svg.update(tdir)
+    # svg.update(tdir)
     sub.update(tdir)
 
     if nanoHUB_flag:
@@ -253,7 +253,7 @@ def outcb(s):
     # Only update file list for certain messages: 
     if "simulat" in s:
         # New Data. update visualizations
-        svg.update('')
+        # svg.update('')
         sub.update('')
     return s
 
@@ -285,7 +285,7 @@ def run_button_cb(s):
 
     tdir = os.path.abspath('tmpdir')
     os.chdir(tdir)  # operate from tmpdir; temporary output goes here.  may be copied to cache later
-    svg.update(tdir)
+    # svg.update(tdir)
     sub.update(tdir)
 
     subprocess.Popen(["../bin/myproj", "config.xml"])
@@ -326,8 +326,10 @@ if nanoHUB_flag or hublib_flag:
 
 tab_height = 'auto'
 tab_layout = widgets.Layout(width='auto',height=tab_height, overflow_y='scroll',)   # border='2px solid black',
-titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Out: Cell Plots', 'Out: Substrate Plots']
-tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, svg.tab, sub.tab],
+#titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Out: Cell Plots', 'Out: Substrate Plots']
+titles = ['About', 'Config Basics', 'Microenvironment', 'User Params', 'Out: Plots']
+#tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, svg.tab, sub.tab],
+tabs = widgets.Tab(children=[about_tab.tab, config_tab.tab, microenv_tab.tab, user_tab.tab, sub.tab],
                    _titles={i: t for i, t in enumerate(titles)},
                    layout=tab_layout)
 
@@ -349,6 +351,6 @@ else:
 
 # pass in (relative) directory where output data is located
 output_dir = "tmpdir"
-svg.update(output_dir)
+# svg.update(output_dir)
 sub.update_dropdown_fields("data")
 sub.update(output_dir)
