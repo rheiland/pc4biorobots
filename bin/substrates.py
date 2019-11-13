@@ -45,6 +45,8 @@ class SubstrateTab(object):
         self.use_defaults = True
 
         self.svg_xmin = 0
+
+        # Probably don't want to hardwire these if we allow changing the domain size
         self.svg_xrange = 2000
         self.xmin = -1000.
         self.xmax = 1000.
@@ -63,6 +65,8 @@ class SubstrateTab(object):
         # define dummy size of mesh (set in the tool's primary module)
         self.numx = 0
         self.numy = 0
+
+        self.title_str = ''
 
         tab_height = '600px'
         tab_height = '500px'
@@ -561,7 +565,7 @@ class SubstrateTab(object):
                 svals = child.text.split()
                 # title_str = "(" + str(current_idx) + ") Current time: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
                 # title_str = "Current time: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
-                title_str = svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
+                self.title_str += "   cells: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
 
             # print("width ",child.attrib['width'])
             # print('attrib=',child.attrib)
@@ -650,14 +654,17 @@ class SubstrateTab(object):
         #   plt.figure(figsize=(6, 6))
         #   plt.cla()
         # if (self.substrates_toggle.value):
-        title_str += " (" + str(num_cells) + " agents)"
+        self.title_str += " (" + str(num_cells) + " agents)"
             # title_str = " (" + str(num_cells) + " agents)"
         # else:
             # mins= round(int(float(root.find(".//current_time").text)))  # TODO: check units = mins
             # hrs = int(mins/60)
             # days = int(hrs/24)
             # title_str = '%dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
-        plt.title(title_str)
+        plt.title(self.title_str)
+
+        plt.xlim(self.xmin, self.xmax)
+        plt.ylim(self.ymin, self.ymax)
 
         #   plt.xlim(axes_min,axes_max)
         #   plt.ylim(axes_min,axes_max)
@@ -713,6 +720,8 @@ class SubstrateTab(object):
     #---------------------------------------------------------------------------
     def plot_substrate(self, frame, grid):
         # global current_idx, axes_max, gFileId, field_index
+
+        self.title_str = ''
         if (self.substrates_toggle.value):
             fname = "output%08d_microenvironment0.mat" % frame
             xml_fname = "output%08d.xml" % frame
@@ -735,7 +744,7 @@ class SubstrateTab(object):
             mins= round(int(float(xml_root.find(".//current_time").text)))  # TODO: check units = mins
             hrs = int(mins/60)
             days = int(hrs/24)
-            title_str = '%dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
+            self.title_str = 'substrate: %dd, %dh, %dm' % (int(days),(hrs%24), mins - (hrs*60))
 
 
             info_dict = {}
@@ -803,7 +812,7 @@ class SubstrateTab(object):
                     # print('got error on contourf 2.')
 
             if (contour_ok):
-                main_ax.set_title(title_str, fontsize=self.fontsize)
+                main_ax.set_title(self.title_str, fontsize=self.fontsize)
                 main_ax.tick_params(labelsize=self.fontsize)
             # cbar = plt.colorbar(my_plot)
                 cbar = self.fig.colorbar(substrate_plot, ax=main_ax)
