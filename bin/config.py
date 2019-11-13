@@ -182,11 +182,9 @@ class ConfigTab(object):
             
         self.toggle_mcds.observe(toggle_mcds_cb)
        
-        #svg_output_row = HBox([toggle_svg, svg_t0, svg_interval])
-        #mat_output_row = HBox([toggle_mcds, mcds_t0, mcds_interval])
-#        svg_mat_output_row = HBox([self.toggle_svg, self.svg_interval, self.toggle_mcds, self.mcds_interval])
-        svg_mat_output_row = HBox([Label('Plots:'),self.toggle_svg, HBox([self.svg_interval,Label('min')]), 
-            self.toggle_mcds, HBox([self.mcds_interval,Label('min')])  ])
+        # svg_mat_output_row = HBox([Label('Plots:'),self.toggle_svg, HBox([self.svg_interval,Label('min')]), 
+            # self.toggle_mcds, HBox([self.mcds_interval,Label('min')])  ])
+        svg_mat_output_row = HBox( [Label('Plots:'), self.svg_interval, Label('min')]) 
         #write_config_row = HBox([write_config_button, write_config_file])
         #run_sim_row = HBox([run_button, run_command_str, kill_button])
         # run_sim_row = HBox([run_button, run_command_str])
@@ -260,7 +258,8 @@ class ConfigTab(object):
         xml_root.find(".//SVG").find(".//enable").text = str(self.toggle_svg.value)
         xml_root.find(".//SVG").find(".//interval").text = str(self.svg_interval.value)
         xml_root.find(".//full_data").find(".//enable").text = str(self.toggle_mcds.value)
-        xml_root.find(".//full_data").find(".//interval").text = str(self.mcds_interval.value)
+        # xml_root.find(".//full_data").find(".//interval").text = str(self.mcds_interval.value)
+        xml_root.find(".//full_data").find(".//interval").text = str(self.svg_interval.value)
 
         #    user_details = ET.SubElement(root, "user_details")
         #    ET.SubElement(user_details, "PhysiCell_settings", name="version").text = "devel-version"
