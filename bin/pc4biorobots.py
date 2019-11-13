@@ -54,6 +54,8 @@ def read_config_cb(_b):
     # with debug_view:
     #     print("read_config_cb", read_config.value)
 
+    sub.first_time = True
+
     if read_config.value is None:  #occurs when a Run just finishes and we update pulldown with the new cache dir??
         # with debug_view:
         #     print("NOTE: read_config_cb(): No read_config.value. Returning!")
@@ -353,4 +355,6 @@ else:
 output_dir = "tmpdir"
 # svg.update(output_dir)
 sub.update_dropdown_fields("data")
+print('config_tab.svg_interval.value= ',config_tab.svg_interval.value )
+print('config_tab.mcds_interval.value= ',config_tab.mcds_interval.value )
 sub.update(output_dir)

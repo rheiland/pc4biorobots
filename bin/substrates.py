@@ -1,6 +1,7 @@
 # substrates  Tab
 
 import os, math
+from pathlib import Path
 from ipywidgets import Layout, Label, Text, Checkbox, Button, BoundedIntText, HBox, VBox, Box, \
     FloatText, Dropdown, interactive
 import matplotlib.pyplot as plt
@@ -42,7 +43,14 @@ class SubstrateTab(object):
 
         # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
 
+        self.first_time = True
+
         self.use_defaults = True
+
+        self.svg_delta_t = 0
+        self.substrate_delta_t = 0
+        self.svg_frame = 1
+        self.substrate_frame = 1
 
         self.svg_xmin = 0
 
@@ -364,19 +372,33 @@ class SubstrateTab(object):
 #            layout=Layout(width=constWidth)
 #         )
 
-    def update_max_frames_expected(self, value):  # called when beginning an interactive Run
-        self.max_frames.value = value  # assumes naming scheme: "snapshot%08d.svg"
-        self.mcds_plot.children[0].max = self.max_frames.value
+    # def update_max_frames_expected(self, value):  # called when beginning an interactive Run
+    #     self.max_frames.value = value  # assumes naming scheme: "snapshot%08d.svg"
+    #     self.mcds_plot.children[0].max = self.max_frames.value
 
 #    def update(self, rdir):
     def update(self, rdir=''):
         # with debug_view:
         #     print("substrates: update rdir=", rdir)        
+        # print("substrates: update rdir=", rdir)        
 
         if rdir:
             self.output_dir = rdir
 
-        all_files = sorted(glob.glob(os.path.join(self.output_dir, 'output*.xml')))
+        if self.first_time:
+            self.first_time = False
+            full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
+            print("substrates: update(), config.xml = ",full_xml_filename)        
+            if full_xml_filename.is_file():
+                tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
+                xml_root = tree.getroot()
+                self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
+                self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
+                print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
+
+
+        # all_files = sorted(glob.glob(os.path.join(self.output_dir, 'output*.xml')))  # if the substrates/MCDS
+        all_files = sorted(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))   # if .svg
         if len(all_files) > 0:
             last_file = all_files[-1]
             self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "snapshot%08d.svg"
@@ -563,9 +585,8 @@ class SubstrateTab(object):
                 # print("debug> found width --> axes_max =", axes_max)
             if child.text and "Current time" in child.text:
                 svals = child.text.split()
-                # title_str = "(" + str(current_idx) + ") Current time: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
-                # title_str = "Current time: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
-                self.title_str += "   cells: " + svals[2] + "d, " + svals[4] + "h, " + svals[7] + "m"
+                # remove the ".00" on minutes
+                self.title_str += "   cells: " + svals[2] + "d, " + svals[4] + "h, " + svals[7][:-3] + "m"
 
             # print("width ",child.attrib['width'])
             # print('attrib=',child.attrib)
@@ -721,10 +742,13 @@ class SubstrateTab(object):
     def plot_substrate(self, frame, grid):
         # global current_idx, axes_max, gFileId, field_index
 
+        print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
+        print("plot_substrate(): frame*self.svg_delta_t  = ",frame*self.svg_delta_t)
         self.title_str = ''
+        # if (self.substrates_toggle.value and frame*self.substrate_delta_t <= self.svg_frame*self.svg_delta_t):
         if (self.substrates_toggle.value):
-            fname = "output%08d_microenvironment0.mat" % frame
-            xml_fname = "output%08d.xml" % frame
+            fname = "output%08d_microenvironment0.mat" % self.substrate_frame
+            xml_fname = "output%08d.xml" % self.substrate_frame
             # print("--- plot_substrate")
             # fullname = output_dir_str + fname
 
@@ -840,7 +864,10 @@ class SubstrateTab(object):
 
         # Now plot the cells (possibly on top of the substrate)
         if (self.cells_toggle.value):
-            self.plot_svg(frame)
+            # self.plot_svg(frame)
+            self.svg_frame = frame
+            print('plot_svg with frame=',self.svg_frame)
+            self.plot_svg(self.svg_frame)
 
         # plt.subplot(grid[2, 0])
         # oxy_ax = self.fig.add_subplot(grid[2:, 0:1])
@@ -882,16 +909,17 @@ class SubstrateTab(object):
 
     #---------------------------------------------------------------------------
     def plot_plots(self, frame):
-        # global current_idx, axes_max, gFileId, field_index
-        #self.fig = plt.figure(figsize=(18, 12))
-        # self.fig = plt.figure(figsize=(16.8, 14))
+        # if (self.first_time):
+        #     self.svg_delta_t = 1
+        #     self.substrate_delta_t = 1
+        #     self.first_time = False
+
         if (self.substrates_toggle.value):
             self.fig = plt.figure(figsize=(14, 15.6))
-        else:
+        else:  # only cells being displayed (maybe)
             # self.fig = plt.figure(figsize=(14, 14.0))
             # self.fig = plt.figure(figsize=(14, 15.6))
             self.fig = plt.figure(figsize=(12, 12))
         grid = plt.GridSpec(4, 3, wspace=0.10, hspace=0.2)   # (nrows, ncols)
         self.plot_substrate(frame, grid)
         # self.plot_svg(frame)
-        # self.plot_oxygen(frame, grid)
