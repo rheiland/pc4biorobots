@@ -78,7 +78,9 @@ void setup_microenvironment( void )
 	// based on what's in the user_parameters section 
 	
 	microenvironment.name = "synthetic tissue"; 
-	
+
+/*
+	// this setup is now in the XML 
 	int cargo_index = microenvironment.find_density_index( "cargo signal" ); 
 	int director_index = microenvironment.find_density_index( "director signal" ); 
 	
@@ -91,6 +93,7 @@ void setup_microenvironment( void )
 		parameters.doubles("director_signal_D");  
 	microenvironment.decay_rates[director_index] = 
 		parameters.doubles("director_signal_decay"); 
+*/		
 	
 	// display the microenvironment again 
 	
