@@ -198,9 +198,13 @@ def run_done_func(s, rdir):
     # with debug_view:
     #     print('run_done_func: ---- after updating read_config.options')
 
+    sub.update_dropdown_fields("data")   # fill in the substrate field(s)
+
     # and update visualizations
     # svg.update(rdir)
     sub.update(rdir)
+
+
     # with debug_view:
     #     print('RDF DONE')
 
@@ -354,7 +358,9 @@ else:
 # pass in (relative) directory where output data is located
 output_dir = "tmpdir"
 # svg.update(output_dir)
-sub.update_dropdown_fields("data")
+
+# sub.update_dropdown_fields("data")   # WARNING: generates multiple "<Figure size...>" stdout!
+
 # print('config_tab.svg_interval.value= ',config_tab.svg_interval.value )
 # print('config_tab.mcds_interval.value= ',config_tab.mcds_interval.value )
 sub.update(output_dir)

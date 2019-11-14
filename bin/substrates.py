@@ -85,7 +85,8 @@ class SubstrateTab(object):
 
         max_frames = 1   
         # self.mcds_plot = interactive(self.plot_substrate, frame=(0, max_frames), continuous_update=False)  
-        self.mcds_plot = interactive(self.plot_plots, frame=(0, max_frames), continuous_update=False)  
+        # self.i_plot = interactive(self.plot_plots, frame=(0, max_frames), continuous_update=False)  
+        self.i_plot = interactive(self.plot_substrate, frame=(0, max_frames), continuous_update=False)  
 
         # "plot_size" controls the size of the tab height, not the plot (rf. figsize for that)
         # NOTE: the Substrates Plot tab has an extra row of widgets at the top of it (cf. Cell Plots tab)
@@ -93,8 +94,8 @@ class SubstrateTab(object):
         svg_plot_size = '600px'
         svg_plot_size = '700px'
         svg_plot_size = '900px'
-        self.mcds_plot.layout.width = svg_plot_size
-        self.mcds_plot.layout.height = svg_plot_size
+        self.i_plot.layout.width = svg_plot_size
+        self.i_plot.layout.height = svg_plot_size
 
         self.fontsize = 20
 
@@ -131,7 +132,6 @@ class SubstrateTab(object):
             #     description='Field',
            layout=Layout(width=constWidth)
         )
-        #self.field_cmap.observe(self.plot_substrate)
 #        self.field_cmap.observe(self.plot_substrate)
         self.field_cmap.observe(self.mcds_field_cb)
 
@@ -219,7 +219,7 @@ class SubstrateTab(object):
                 self.show_edge = True
             else:
                 self.show_edge = False
-            self.mcds_plot.update()
+            self.i_plot.update()
 
         self.cell_edges_toggle.observe(cell_edges_toggle_cb)
 
@@ -231,7 +231,7 @@ class SubstrateTab(object):
         )
         def cells_toggle_cb(b):
             # self.update()
-            self.mcds_plot.update()
+            self.i_plot.update()
             if (self.cells_toggle.value):
                 self.cell_edges_toggle.disabled = False
             else:
@@ -270,7 +270,7 @@ class SubstrateTab(object):
         )
         def grid_toggle_cb(b):
             # self.update()
-            self.mcds_plot.update()
+            self.i_plot.update()
 
         self.grid_toggle.observe(grid_toggle_cb)
 
@@ -281,7 +281,6 @@ class SubstrateTab(object):
 #        mcds_params = VBox([self.mcds_field, field_cmap_row2, field_cmap_row3,])  # mcds_dir
 
 #        self.tab = HBox([mcds_params, self.mcds_plot], layout=tab_layout)
-#        self.tab = HBox([mcds_params, self.mcds_plot])
 
         help_label = Label('select slider: drag or left/right arrows')
         # row1 = Box([help_label, Box( [self.max_frames, self.mcds_field, self.field_cmap], layout=Layout(border='0px solid black',
@@ -323,14 +322,12 @@ class SubstrateTab(object):
                                             tooltip='You need to allow pop-ups in your browser', cb=self.download_svg_cb)
             download_row = HBox([self.download_button.w, self.download_svg_button.w, Label("Download all cell plots (browser must allow pop-ups).")])
 
-    #        self.tab = VBox([row1, row2, self.mcds_plot])
-            # self.tab = VBox([row1, row2, self.mcds_plot, download_row])
             # box_layout = Layout(border='0px solid')
             controls_box = VBox([row1, row2])  # ,width='50%', layout=box_layout)
-            self.tab = VBox([controls_box, self.mcds_plot, download_row])
+            self.tab = VBox([controls_box, self.i_plot, download_row])
         else:
             # self.tab = VBox([row1, row2])
-            self.tab = VBox([row1, row2, self.mcds_plot])
+            self.tab = VBox([row1, row2, self.i_plot])
 
     #---------------------------------------------------
     def update_dropdown_fields(self, data_dir):
@@ -377,6 +374,7 @@ class SubstrateTab(object):
     #     self.mcds_plot.children[0].max = self.max_frames.value
 
 #    def update(self, rdir):
+#   Called from pc4biorobots.py (among other places?)
     def update(self, rdir=''):
         # with debug_view:
         #     print("substrates: update rdir=", rdir)        
@@ -394,11 +392,11 @@ class SubstrateTab(object):
             # print("substrates: num_svgs,num_substrates =",self.num_svgs,self.num_substrates)        
             self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
             # print("substrates: modulo=",self.modulo)        
-            if full_xml_filename.is_file():
-                tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
-                xml_root = tree.getroot()
-                self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
-                self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
+            # if full_xml_filename.is_file():
+            #     tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
+            #     xml_root = tree.getroot()
+            #     self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
+            #     self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
                 # print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
 
 
@@ -407,28 +405,6 @@ class SubstrateTab(object):
         if len(all_files) > 0:
             last_file = all_files[-1]
             self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "snapshot%08d.svg"
-
-        # with debug_view:
-        #     print("substrates: added %s files" % len(all_files))
-
-
-        # self.output_dir = rdir
-        # if rdir == '':
-        #     # self.max_frames.value = 0
-        #     tmpdir = os.path.abspath('tmpdir')
-        #     self.output_dir = tmpdir
-        #     all_files = sorted(glob.glob(os.path.join(tmpdir, 'output*.xml')))
-        #     if len(all_files) > 0:
-        #         last_file = all_files[-1]
-        #         self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "output%08d.xml"
-        #         self.mcds_plot.update()
-        #     return
-
-        # all_files = sorted(glob.glob(os.path.join(rdir, 'output*.xml')))
-        # if len(all_files) > 0:
-        #     last_file = all_files[-1]
-        #     self.max_frames.value = int(last_file[-12:-4])  # assumes naming scheme: "output%08d.xml"
-        #     self.mcds_plot.update()
 
     def download_svg_cb(self):
         file_str = os.path.join(self.output_dir, '*.svg')
@@ -448,7 +424,7 @@ class SubstrateTab(object):
                 myzip.write(f, os.path.basename(f))
 
     def update_max_frames(self,_b):
-        self.mcds_plot.children[0].max = self.max_frames.value
+        self.i_plot.children[0].max = self.max_frames.value
 
     def mcds_field_changed_cb(self, b):
         # print("mcds_field_changed_cb: self.mcds_field.value=",self.mcds_field.value)
@@ -460,7 +436,7 @@ class SubstrateTab(object):
 #        print('mcds_field_cb: '+field_name)
         self.cmap_min.value = self.field_min_max[field_name][0]
         self.cmap_max.value = self.field_min_max[field_name][1]
-        self.mcds_plot.update()
+        self.i_plot.update()
 
     def mcds_field_cb(self, b):
         #self.field_index = self.mcds_field.value
@@ -475,7 +451,7 @@ class SubstrateTab(object):
 #        self.field_index = self.mcds_field.value + 4
 
 #        print('field_index=',self.field_index)
-        self.mcds_plot.update()
+        self.i_plot.update()
 
 
     #---------------------------------------------------------------------------
@@ -745,7 +721,8 @@ class SubstrateTab(object):
 
     #---------------------------------------------------------------------------
     # assume "frame" is cell frame #, unless Cells is togggled off, then it's the substrate frame #
-    def plot_substrate(self, frame, grid):
+    # def plot_substrate(self, frame, grid):
+    def plot_substrate(self, frame):
         # global current_idx, axes_max, gFileId, field_index
 
         # print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
@@ -758,7 +735,12 @@ class SubstrateTab(object):
         # if (self.substrates_toggle.value and frame*self.substrate_delta_t <= self.svg_frame*self.svg_delta_t):
         # if (self.substrates_toggle.value and (frame % self.modulo == 0)):
         if (self.substrates_toggle.value):
+            # self.fig = plt.figure(figsize=(14, 15.6))
+            self.fig = plt.figure(figsize=(15.0, 12.5))
             self.substrate_frame = int(frame / self.modulo)
+            if (self.substrate_frame > (self.num_substrates-1)):
+                self.substrate_frame = self.num_substrates-1
+            # print('self.substrate_frame = ',self.substrate_frame)
             # if (self.cells_toggle.value):
             #     self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
             #     self.substrate_frame = frame % self.modulo
@@ -807,7 +789,10 @@ class SubstrateTab(object):
             #main_ax = self.fig.add_subplot(grid[:-1, 0:])   # nrows, ncols
             #main_ax = self.fig.add_subplot(grid[0:, 0:])   # nrows, ncols
             #main_ax = self.fig.add_subplot(grid[0:4, 0:])   # nrows, ncols
-            main_ax = self.fig.add_subplot(grid[0:3, 0:])   # nrows, ncols
+
+
+            # main_ax = self.fig.add_subplot(grid[0:3, 0:])   # nrows, ncols
+            # main_ax = self.fig.add_subplot(111)   # nrows, ncols
 
 
             # plt.rc('font', size=10)  # TODO: does this affect the Cell plots fonts too? YES. Not what we want.
@@ -841,30 +826,36 @@ class SubstrateTab(object):
             contour_ok = True
             if (self.cmap_fixed.value):
                 try:
-                    substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy, self.numx), levels=levels, extend='both', cmap=self.field_cmap.value, fontsize=self.fontsize)
                 except:
                     contour_ok = False
                     # print('got error on contourf 1.')
             else:    
                 try:
-                    substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    # substrate_plot = main_ax.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
+                    substrate_plot = plt.contourf(xgrid, ygrid, M[self.field_index, :].reshape(self.numy,self.numx), num_contours, cmap=self.field_cmap.value)
                 except:
                     contour_ok = False
                     # print('got error on contourf 2.')
 
             if (contour_ok):
-                main_ax.set_title(self.title_str, fontsize=self.fontsize)
-                main_ax.tick_params(labelsize=self.fontsize)
+                # main_ax.set_title(self.title_str, fontsize=self.fontsize)
+                plt.title(self.title_str, fontsize=self.fontsize)
+                # main_ax.tick_params(labelsize=self.fontsize)
             # cbar = plt.colorbar(my_plot)
-                cbar = self.fig.colorbar(substrate_plot, ax=main_ax)
+                # cbar = self.fig.colorbar(substrate_plot, ax=main_ax)
+                cbar = self.fig.colorbar(substrate_plot)
                 cbar.ax.tick_params(labelsize=self.fontsize)
                 # cbar = main_ax.colorbar(my_plot)
                 # cbar.ax.tick_params(labelsize=self.fontsize)
             # axes_min = 0
             # axes_max = 2000
 
-            main_ax.set_xlim([self.xmin, self.xmax])
-            main_ax.set_ylim([self.ymin, self.ymax])
+            # main_ax.set_xlim([self.xmin, self.xmax])
+            # main_ax.set_ylim([self.ymin, self.ymax])
+            plt.xlim(self.xmin, self.xmax)
+            plt.ylim(self.ymin, self.ymax)
 
             # if (frame == 0):  # maybe allow substrate grid display later
             #     xs = np.linspace(self.xmin,self.xmax,self.numx)
@@ -881,6 +872,8 @@ class SubstrateTab(object):
 
         # Now plot the cells (possibly on top of the substrate)
         if (self.cells_toggle.value):
+            if (not self.substrates_toggle.value):
+                self.fig = plt.figure(figsize=(12, 12))
             # self.plot_svg(frame)
             self.svg_frame = frame
             # print('plot_svg with frame=',self.svg_frame)
@@ -901,29 +894,6 @@ class SubstrateTab(object):
         # x = np.linspace(0, 500)
         # oxy_ax.plot(x, 300*np.sin(x))
 
-
-# mcds_play = widgets.Play(
-# #     interval=10,
-#     value=50,
-#     min=0,
-#     max=100,
-#     step=1,
-#     description="Press play",
-#     disabled=False,
-# )
-# #mcds_slider = widgets.IntSlider()
-
-# widgets.jslink((mcds_play, 'value'), (mcds_slider, 'value'))
-# widgets.HBox([mcds_play, mcds_slider])
-
-    # def plot_oxygen(self, frame, grid):
-    #     self.fig = plt.figure(figsize=(18.0,15))  # this strange figsize results in a ~square contour plot
-    #     #plt.subplot(grid[2, 0])
-    #     plt.subplot(grid[0, 2])
-    #     x = np.linspace(0, 10)
-    #     plt.plot(np.sin(x))
-    #     # ax1.plot(np.sin(x))
-
     #---------------------------------------------------------------------------
     def plot_plots(self, frame):
         # if (self.first_time):
@@ -934,9 +904,8 @@ class SubstrateTab(object):
         if (self.substrates_toggle.value):
             self.fig = plt.figure(figsize=(14, 15.6))
         else:  # only cells being displayed (maybe)
-            # self.fig = plt.figure(figsize=(14, 14.0))
-            # self.fig = plt.figure(figsize=(14, 15.6))
             self.fig = plt.figure(figsize=(12, 12))
-        grid = plt.GridSpec(4, 3, wspace=0.10, hspace=0.2)   # (nrows, ncols)
-        self.plot_substrate(frame, grid)
+        # grid = plt.GridSpec(4, 3, wspace=0.10, hspace=0.2)   # (nrows, ncols)
+        # self.plot_substrate(frame, grid)
+        self.plot_substrate(frame)
         # self.plot_svg(frame)
