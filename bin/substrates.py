@@ -388,13 +388,18 @@ class SubstrateTab(object):
         if self.first_time:
             self.first_time = False
             full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
-            print("substrates: update(), config.xml = ",full_xml_filename)        
+            # print("substrates: update(), config.xml = ",full_xml_filename)        
+            self.num_svgs = len(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))
+            self.num_substrates = len(glob.glob(os.path.join(self.output_dir, 'output*.xml')))
+            # print("substrates: num_svgs,num_substrates =",self.num_svgs,self.num_substrates)        
+            self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
+            # print("substrates: modulo=",self.modulo)        
             if full_xml_filename.is_file():
                 tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
                 xml_root = tree.getroot()
                 self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
                 self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
-                print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
+                # print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
 
 
         # all_files = sorted(glob.glob(os.path.join(self.output_dir, 'output*.xml')))  # if the substrates/MCDS
@@ -739,14 +744,26 @@ class SubstrateTab(object):
         # plt.title(title_str)
 
     #---------------------------------------------------------------------------
+    # assume "frame" is cell frame #, unless Cells is togggled off, then it's the substrate frame #
     def plot_substrate(self, frame, grid):
         # global current_idx, axes_max, gFileId, field_index
 
-        print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
-        print("plot_substrate(): frame*self.svg_delta_t  = ",frame*self.svg_delta_t)
+        # print("plot_substrate(): frame*self.substrate_delta_t  = ",frame*self.substrate_delta_t)
+        # print("plot_substrate(): frame*self.svg_delta_t  = ",frame*self.svg_delta_t)
         self.title_str = ''
+
+        # Assume: # .svg files >= # substrate files
+#        if (self.cells_toggle.value):
+
         # if (self.substrates_toggle.value and frame*self.substrate_delta_t <= self.svg_frame*self.svg_delta_t):
+        # if (self.substrates_toggle.value and (frame % self.modulo == 0)):
         if (self.substrates_toggle.value):
+            self.substrate_frame = int(frame / self.modulo)
+            # if (self.cells_toggle.value):
+            #     self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
+            #     self.substrate_frame = frame % self.modulo
+            # else:
+            #     self.substrate_frame = frame 
             fname = "output%08d_microenvironment0.mat" % self.substrate_frame
             xml_fname = "output%08d.xml" % self.substrate_frame
             # print("--- plot_substrate")
@@ -866,7 +883,7 @@ class SubstrateTab(object):
         if (self.cells_toggle.value):
             # self.plot_svg(frame)
             self.svg_frame = frame
-            print('plot_svg with frame=',self.svg_frame)
+            # print('plot_svg with frame=',self.svg_frame)
             self.plot_svg(self.svg_frame)
 
         # plt.subplot(grid[2, 0])

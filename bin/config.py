@@ -154,6 +154,28 @@ class ConfigTab(object):
             description='every',
             layout=Layout(width='160px'),
         )
+        self.mcds_interval = BoundedIntText(
+            min=0,
+            max=99999999,
+            description='every',
+#            disabled=True,
+            layout=Layout(width='160px'),
+        )
+
+        # don't let this be > mcds interval
+        def svg_interval_cb(b):
+            if (self.svg_interval.value > self.mcds_interval.value):
+                self.svg_interval.value = self.mcds_interval.value
+
+        self.svg_interval.observe(svg_interval_cb)
+
+        # don't let this be < svg interval
+        def mcds_interval_cb(b):
+            if (self.mcds_interval.value < self.svg_interval.value):
+                self.mcds_interval.value = self.svg_interval.value
+
+        self.mcds_interval.observe(mcds_interval_cb)
+
         def toggle_svg_cb(b):
             if (self.toggle_svg.value):
                 # self.svg_t0.disabled = False 
@@ -175,13 +197,6 @@ class ConfigTab(object):
         #     disabled=True,
         #     layout=Layout(width=constWidth),
         # )
-        self.mcds_interval = BoundedIntText(
-            min=0,
-            max=99999999,
-            description='every',
-#            disabled=True,
-            layout=Layout(width='160px'),
-        )
         def toggle_mcds_cb(b):
             if (self.toggle_mcds.value):
                 # self.mcds_t0.disabled = False #False
