@@ -198,7 +198,7 @@ def run_done_func(s, rdir):
     # with debug_view:
     #     print('run_done_func: ---- after updating read_config.options')
 
-    sub.update_dropdown_fields("data")   # fill in the substrate field(s)
+    # sub.update_dropdown_fields("data")   # WARNING: fill in the substrate field(s)
 
     # and update visualizations
     # svg.update(rdir)

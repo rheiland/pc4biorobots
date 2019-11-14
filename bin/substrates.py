@@ -108,10 +108,11 @@ class SubstrateTab(object):
 
         self.field_min_max = {'dummy': [0., 1.]}
         # hacky I know, but make a dict that's got (key,value) reversed from the dict in the Dropdown below
-        self.field_dict = {0:'dummy'}
+        # self.field_dict = {0:'dummy'}
+        self.field_dict = {0:'director signal', 1:'cargo signal'}
 
         self.mcds_field = Dropdown(
-            options={'dummy': 0},
+            options={'director signal': 0, 'cargo signal':1},
             value=0,
             #     description='Field',
            layout=Layout(width=constWidth)
@@ -360,7 +361,7 @@ class SubstrateTab(object):
 #        constWidth = '180px'
         # print('options=',dropdown_options)
         self.mcds_field.value=0
-        self.mcds_field.options=dropdown_options
+        self.mcds_field.options = dropdown_options
 #         self.mcds_field = Dropdown(
 # #            options={'oxygen': 0, 'glucose': 1},
 #             options=dropdown_options,
