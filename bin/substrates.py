@@ -38,8 +38,8 @@ class SubstrateTab(object):
 
     def __init__(self):
         
-        self.output_dir = '.'
-#        self.output_dir = 'tmpdir'
+        # self.output_dir = '.'
+        self.output_dir = 'tmpdir'
 
         # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
 
@@ -383,6 +383,8 @@ class SubstrateTab(object):
 
         if rdir:
             self.output_dir = rdir
+
+        # print('update(): self.output_dir = ', self.output_dir)
 
         if self.first_time:
             self.first_time = False
