@@ -106,7 +106,9 @@ class SubstrateTab(object):
         )
         self.max_frames.observe(self.update_max_frames)
 
-        self.field_min_max = {'dummy': [0., 1.]}
+        # self.field_min_max = {'dummy': [0., 1.]}
+        # NOTE: manually setting these for now (vs. parsing them out of data/initial.xml)
+        self.field_min_max = {'director signal':[0.,1.], 'cargo signal':[0.,1.] }
         # hacky I know, but make a dict that's got (key,value) reversed from the dict in the Dropdown below
         # self.field_dict = {0:'dummy'}
         self.field_dict = {0:'director signal', 1:'cargo signal'}
@@ -436,7 +438,7 @@ class SubstrateTab(object):
         self.field_index = self.mcds_field.value + 4
 
         field_name = self.field_dict[self.mcds_field.value]
-#        print('mcds_field_cb: '+field_name)
+        # print('mcds_field_cb: '+field_name)
         self.cmap_min.value = self.field_min_max[field_name][0]
         self.cmap_max.value = self.field_min_max[field_name][1]
         self.i_plot.update()
