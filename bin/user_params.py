@@ -37,7 +37,7 @@ class UserTab(object):
         param_name2.style.button_color = 'tan'
 
         self.elastic_coefficient = FloatText(
-          value=0.05,
+          value=0.15,
           step=0.01,
           style=style, layout=widget_layout)
 
