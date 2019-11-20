@@ -39,11 +39,12 @@ class SubstrateTab(object):
     def __init__(self):
         
         self.output_dir = '.'
-#        self.output_dir = 'tmpdir'
+        # self.output_dir = 'tmpdir'
 
         # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
 
         self.first_time = True
+        self.modulo = 1
 
         self.use_defaults = True
 
@@ -101,12 +102,14 @@ class SubstrateTab(object):
 
         self.max_frames = BoundedIntText(
             min=0, max=99999, value=max_frames,
-            description='Max',
+            description='# cell frames',
            layout=Layout(width='160px'),
         )
         self.max_frames.observe(self.update_max_frames)
 
-        self.field_min_max = {'dummy': [0., 1.]}
+        # self.field_min_max = {'dummy': [0., 1.]}
+        # NOTE: manually setting these for now (vs. parsing them out of data/initial.xml)
+        self.field_min_max = {'director signal':[0.,1.], 'cargo signal':[0.,1.] }
         # hacky I know, but make a dict that's got (key,value) reversed from the dict in the Dropdown below
         # self.field_dict = {0:'dummy'}
         self.field_dict = {0:'director signal', 1:'cargo signal'}
@@ -374,6 +377,7 @@ class SubstrateTab(object):
     #     self.max_frames.value = value  # assumes naming scheme: "snapshot%08d.svg"
     #     self.mcds_plot.children[0].max = self.max_frames.value
 
+#------------------------------------------------------------------------------
 #    def update(self, rdir):
 #   Called from pc4biorobots.py (among other places?)
     def update(self, rdir=''):
@@ -384,24 +388,31 @@ class SubstrateTab(object):
         if rdir:
             self.output_dir = rdir
 
-        if self.first_time:
+        # print('update(): self.output_dir = ', self.output_dir)
+
+        # if self.first_time:
+        if True:
             self.first_time = False
             full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
             # print("substrates: update(), config.xml = ",full_xml_filename)        
-            self.num_svgs = len(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))
-            self.num_substrates = len(glob.glob(os.path.join(self.output_dir, 'output*.xml')))
+            # self.num_svgs = len(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))
+            # self.num_substrates = len(glob.glob(os.path.join(self.output_dir, 'output*.xml')))
             # print("substrates: num_svgs,num_substrates =",self.num_svgs,self.num_substrates)        
-            self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
-            # print("substrates: modulo=",self.modulo)        
-            # if full_xml_filename.is_file():
-            #     tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
-            #     xml_root = tree.getroot()
-            #     self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
-            #     self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
+            # argh - no! If no files created, then denom = -1
+            # self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
+            # print("substrates: update(): modulo=",self.modulo)        
+            if full_xml_filename.is_file():
+                tree = ET.parse(full_xml_filename)  # this file cannot be overwritten; part of tool distro
+                xml_root = tree.getroot()
+                self.svg_delta_t = int(xml_root.find(".//SVG//interval").text)
+                self.substrate_delta_t = int(xml_root.find(".//full_data//interval").text)
                 # print("substrates: svg,substrate delta_t values=",self.svg_delta_t,self.substrate_delta_t)        
+                self.modulo = int(self.substrate_delta_t / self.svg_delta_t)
+                # print("substrates: update(): modulo=",self.modulo)        
 
 
         # all_files = sorted(glob.glob(os.path.join(self.output_dir, 'output*.xml')))  # if the substrates/MCDS
+
         all_files = sorted(glob.glob(os.path.join(self.output_dir, 'snap*.svg')))   # if .svg
         if len(all_files) > 0:
             last_file = all_files[-1]
@@ -434,7 +445,7 @@ class SubstrateTab(object):
         self.field_index = self.mcds_field.value + 4
 
         field_name = self.field_dict[self.mcds_field.value]
-#        print('mcds_field_cb: '+field_name)
+        # print('mcds_field_cb: '+field_name)
         self.cmap_min.value = self.field_min_max[field_name][0]
         self.cmap_max.value = self.field_min_max[field_name][1]
         self.i_plot.update()
@@ -739,8 +750,11 @@ class SubstrateTab(object):
             # self.fig = plt.figure(figsize=(14, 15.6))
             self.fig = plt.figure(figsize=(15.0, 12.5))
             self.substrate_frame = int(frame / self.modulo)
-            if (self.substrate_frame > (self.num_substrates-1)):
-                self.substrate_frame = self.num_substrates-1
+            # print("plot_substrate(): self.substrate_frame=",self.substrate_frame)        
+
+            # if (self.substrate_frame > (self.num_substrates-1)):
+                # self.substrate_frame = self.num_substrates-1
+
             # print('self.substrate_frame = ',self.substrate_frame)
             # if (self.cells_toggle.value):
             #     self.modulo = int((self.num_svgs - 1) / (self.num_substrates - 1))
@@ -749,11 +763,11 @@ class SubstrateTab(object):
             #     self.substrate_frame = frame 
             fname = "output%08d_microenvironment0.mat" % self.substrate_frame
             xml_fname = "output%08d.xml" % self.substrate_frame
-            # print("--- plot_substrate")
             # fullname = output_dir_str + fname
 
     #        fullname = fname
             full_fname = os.path.join(self.output_dir, fname)
+            # print("--- plot_substrate(): full_fname=",full_fname)
             full_xml_fname = os.path.join(self.output_dir, xml_fname)
     #        self.output_dir = '.'
 
@@ -807,6 +821,7 @@ class SubstrateTab(object):
 
             # print("substrates.py: ------- numx, numy = ", self.numx, self.numy )
             if (self.numx == 0):   # need to parse vals from the config.xml
+                # print("--- plot_substrate(): full_fname=",full_fname)
                 fname = os.path.join(self.output_dir, "config.xml")
                 tree = ET.parse(fname)
                 xml_root = tree.getroot()

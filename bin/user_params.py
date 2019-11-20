@@ -37,7 +37,7 @@ class UserTab(object):
         param_name2.style.button_color = 'tan'
 
         self.elastic_coefficient = FloatText(
-          value=0.05,
+          value=0.15,
           step=0.01,
           style=style, layout=widget_layout)
 
@@ -159,7 +159,7 @@ class UserTab(object):
         desc_button2.style.button_color = 'tan'
         desc_button3 = Button(description='time between direction changes for workers', disabled=True, layout=desc_button_layout) 
         desc_button3.style.button_color = 'lightgreen'
-        desc_button4 = Button(description='', disabled=True, layout=desc_button_layout) 
+        desc_button4 = Button(description='worker migration speed', disabled=True, layout=desc_button_layout) 
         desc_button4.style.button_color = 'tan'
         desc_button5 = Button(description='how strictly attached workers follow chemotactic signals', disabled=True, layout=desc_button_layout) 
         desc_button5.style.button_color = 'lightgreen'
