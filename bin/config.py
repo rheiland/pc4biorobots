@@ -149,7 +149,7 @@ class ConfigTab(object):
         #     layout=Layout(width=constWidth),
         # )
         self.svg_interval = BoundedIntText(
-            min=1,
+            min=0,
             max=99999999,   # TODO: set max on all Bounded to avoid unwanted default
             description='every',
             layout=Layout(width='160px'),
@@ -167,14 +167,14 @@ class ConfigTab(object):
             if (self.svg_interval.value > self.mcds_interval.value):
                 self.svg_interval.value = self.mcds_interval.value
 
-        self.svg_interval.observe(svg_interval_cb)
+        # self.svg_interval.observe(svg_interval_cb)  # BEWARE: when fill_gui, this sets value = 1 !!
 
         # don't let this be < svg interval
         def mcds_interval_cb(b):
             if (self.mcds_interval.value < self.svg_interval.value):
                 self.mcds_interval.value = self.svg_interval.value
 
-        self.mcds_interval.observe(mcds_interval_cb)
+        self.mcds_interval.observe(mcds_interval_cb)   # BEWARE: see warning above
 
         def toggle_svg_cb(b):
             if (self.toggle_svg.value):
@@ -255,7 +255,18 @@ class ConfigTab(object):
             self.toggle_svg.value = True
         else:
             self.toggle_svg.value = False
+
+        # print('config.py fill_gui(): pre svg_interval.value=',self.svg_interval.value)
+
+        # text_val = xml_root.find(".//SVG//interval").text
+        # print(text_val)
+        # print(text_val.isdigit())
+        # int_val = int(text_val)
+        # print(int_val)
         self.svg_interval.value = int(xml_root.find(".//SVG//interval").text)
+        # self.svg_interval.value = int_val
+        # print('config.py fill_gui(): svg_interval text=',xml_root.find(".//SVG//interval").text)
+        # print('config.py fill_gui(): svg_interval.value=',self.svg_interval.value)
 
         if xml_root.find(".//full_data//enable").text.lower() == 'true':
             self.toggle_mcds.value = True
@@ -266,6 +277,7 @@ class ConfigTab(object):
 
     # Read values from the GUI widgets and generate/write a new XML
     def fill_xml(self, xml_root):
+        # print('config.py fill_xml() !!!!!')
         # TODO: verify template .xml file exists!
 
         # TODO: verify valid type (numeric) and range?

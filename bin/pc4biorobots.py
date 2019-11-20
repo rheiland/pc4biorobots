@@ -71,7 +71,7 @@ def read_config_cb(_b):
 
     if Path(config_file).is_file():
         # with debug_view:
-        #     print("read_config_cb:  calling fill_gui_params with ",config_file)
+        print("read_config_cb:  calling fill_gui_params with ",config_file)
         fill_gui_params(config_file)  #should verify file exists!
     else:
         # with debug_view:
@@ -171,6 +171,7 @@ def get_config_files():
 def fill_gui_params(config_file):
     # with debug_view:
     #     print("fill_gui_params: filling with ",config_file)
+    # print("fill_gui_params: filling with ",config_file)
     tree = ET.parse(config_file)
     xml_root = tree.getroot()
     config_tab.fill_gui(xml_root)
