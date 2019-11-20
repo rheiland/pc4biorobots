@@ -21,8 +21,8 @@ hublib_flag = True
 if platform.system() != 'Windows':
     try:
 #        print("Trying to import hublib.ui")
-        # from hublib.ui import RunCommand, Submit
-        from hublib2.ui import RunCommand, Submit
+        from hublib.ui import RunCommand, Submit
+        # from hublib2.ui import RunCommand, Submit
     except:
         hublib_flag = False
 else:
