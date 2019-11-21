@@ -167,7 +167,7 @@ class ConfigTab(object):
             if (self.svg_interval.value > self.mcds_interval.value):
                 self.svg_interval.value = self.mcds_interval.value
 
-        # self.svg_interval.observe(svg_interval_cb)  # BEWARE: when fill_gui, this sets value = 1 !!
+        self.svg_interval.observe(svg_interval_cb)  # BEWARE: when fill_gui, this sets value = 1 !
 
         # don't let this be < svg interval
         def mcds_interval_cb(b):
@@ -251,10 +251,6 @@ class ConfigTab(object):
         
         self.omp_threads.value = int(xml_root.find(".//omp_num_threads").text)
         
-        if xml_root.find(".//SVG//enable").text.lower() == 'true':
-            self.toggle_svg.value = True
-        else:
-            self.toggle_svg.value = False
 
         # print('config.py fill_gui(): pre svg_interval.value=',self.svg_interval.value)
 
@@ -263,7 +259,6 @@ class ConfigTab(object):
         # print(text_val.isdigit())
         # int_val = int(text_val)
         # print(int_val)
-        self.svg_interval.value = int(xml_root.find(".//SVG//interval").text)
         # self.svg_interval.value = int_val
         # print('config.py fill_gui(): svg_interval text=',xml_root.find(".//SVG//interval").text)
         # print('config.py fill_gui(): svg_interval.value=',self.svg_interval.value)
@@ -273,6 +268,13 @@ class ConfigTab(object):
         else:
             self.toggle_mcds.value = False
         self.mcds_interval.value = int(xml_root.find(".//full_data//interval").text)
+
+        # NOTE: do this *after* filling the mcds_interval, directly above, due to the callback/constraints on them
+        if xml_root.find(".//SVG//enable").text.lower() == 'true':
+            self.toggle_svg.value = True
+        else:
+            self.toggle_svg.value = False
+        self.svg_interval.value = int(xml_root.find(".//SVG//interval").text)
 
 
     # Read values from the GUI widgets and generate/write a new XML
