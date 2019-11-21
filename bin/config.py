@@ -150,13 +150,13 @@ class ConfigTab(object):
         #     layout=Layout(width=constWidth),
         # )
         self.svg_interval = BoundedIntText(
-            min=0,
+            min=1,
             max=99999999,   # TODO: set max on all Bounded to avoid unwanted default
             description='every',
             layout=Layout(width='160px'),
         )
         self.mcds_interval = BoundedIntText(
-            min=0,
+            min=1,
             max=99999999,
             description='every',
 #            disabled=True,
