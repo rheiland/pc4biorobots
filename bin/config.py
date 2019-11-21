@@ -251,18 +251,6 @@ class ConfigTab(object):
         
         self.omp_threads.value = int(xml_root.find(".//omp_num_threads").text)
         
-
-        # print('config.py fill_gui(): pre svg_interval.value=',self.svg_interval.value)
-
-        # text_val = xml_root.find(".//SVG//interval").text
-        # print(text_val)
-        # print(text_val.isdigit())
-        # int_val = int(text_val)
-        # print(int_val)
-        # self.svg_interval.value = int_val
-        # print('config.py fill_gui(): svg_interval text=',xml_root.find(".//SVG//interval").text)
-        # print('config.py fill_gui(): svg_interval.value=',self.svg_interval.value)
-
         if xml_root.find(".//full_data//enable").text.lower() == 'true':
             self.toggle_mcds.value = True
         else:
