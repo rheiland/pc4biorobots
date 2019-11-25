@@ -150,7 +150,7 @@ reset:
 	
 # next 2 targets for nanoHUB
 install: 
-#	. /etc/environ.sh; use -e -r anaconda3-5.1; make all
+	. /etc/environ.sh; use -e -r anaconda3-5.1; make all
 	cp $(PROGRAM_NAME) ../bin
 
 distclean: clean
