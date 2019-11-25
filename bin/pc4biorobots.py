@@ -71,7 +71,7 @@ def read_config_cb(_b):
 
     if Path(config_file).is_file():
         # with debug_view:
-        print("read_config_cb:  calling fill_gui_params with ",config_file)
+        # print("read_config_cb:  calling fill_gui_params with ",config_file)
         fill_gui_params(config_file)  #should verify file exists!
     else:
         # with debug_view:
