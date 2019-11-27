@@ -41,6 +41,11 @@ class SubstrateTab(object):
         self.output_dir = '.'
         # self.output_dir = 'tmpdir'
 
+        self.figsize_width_substrate = 15.0  # allow extra for colormap
+        self.figsize_height_substrate = 12.5
+        self.figsize_width_svg = 12.0
+        self.figsize_height_svg = 12.0
+
         # self.fig = plt.figure(figsize=(7.2,6))  # this strange figsize results in a ~square contour plot
 
         self.first_time = True
@@ -56,13 +61,13 @@ class SubstrateTab(object):
         self.svg_xmin = 0
 
         # Probably don't want to hardwire these if we allow changing the domain size
-        self.svg_xrange = 2000
-        self.xmin = -1000.
-        self.xmax = 1000.
-        self.ymin = -1000.
-        self.ymax = 1000.
-        self.x_range = 2000.
-        self.y_range = 2000.
+        # self.svg_xrange = 2000
+        # self.xmin = -1000.
+        # self.xmax = 1000.
+        # self.ymin = -1000.
+        # self.ymax = 1000.
+        # self.x_range = 2000.
+        # self.y_range = 2000.
 
         self.show_nucleus = 0
         self.show_edge = False
@@ -378,6 +383,39 @@ class SubstrateTab(object):
     #     self.mcds_plot.children[0].max = self.max_frames.value
 
 #------------------------------------------------------------------------------
+    def update_params(self, config_tab):
+        # xml_root.find(".//x_min").text = str(self.xmin.value)
+        # xml_root.find(".//x_max").text = str(self.xmax.value)
+        # xml_root.find(".//dx").text = str(self.xdelta.value)
+        # xml_root.find(".//y_min").text = str(self.ymin.value)
+        # xml_root.find(".//y_max").text = str(self.ymax.value)
+        # xml_root.find(".//dy").text = str(self.ydelta.value)
+        # xml_root.find(".//z_min").text = str(self.zmin.value)
+        # xml_root.find(".//z_max").text = str(self.zmax.value)
+        # xml_root.find(".//dz").text = str(self.zdelta.value)
+
+        self.xmin = config_tab.xmin.value 
+        self.xmax = config_tab.xmax.value 
+        self.x_range = self.xmax - self.xmin
+        self.svg_xrange = self.xmax - self.xmin
+        self.ymin = config_tab.ymin.value
+        self.ymax = config_tab.ymax.value 
+        self.y_range = self.ymax - self.ymin
+
+        if (self.x_range > self.y_range):  
+            ratio = self.y_range / self.x_range
+            self.figsize_width_substrate = 15.0  # allow extra for colormap
+            self.figsize_height_substrate = 12.5 * ratio
+            self.figsize_width_svg = 12.0
+            self.figsize_height_svg = 12.0 * ratio
+        else:   # x < y
+            ratio = self.x_range / self.y_range
+            self.figsize_width_substrate = 15.0 * ratio 
+            self.figsize_height_substrate = 12.5
+            self.figsize_width_svg = 12.0 * ratio
+            self.figsize_height_svg = 12.0 
+
+#------------------------------------------------------------------------------
 #    def update(self, rdir):
 #   Called from pc4biorobots.py (among other places?)
     def update(self, rdir=''):
@@ -390,8 +428,8 @@ class SubstrateTab(object):
 
         # print('update(): self.output_dir = ', self.output_dir)
 
-        # if self.first_time:
-        if True:
+        if self.first_time:
+        # if True:
             self.first_time = False
             full_xml_filename = Path(os.path.join(self.output_dir, 'config.xml'))
             # print("substrates: update(), config.xml = ",full_xml_filename)        
@@ -611,7 +649,8 @@ class SubstrateTab(object):
                 xval = float(circle.attrib['cx'])
 
                 # map SVG coords into comp domain
-                xval = (xval-self.svg_xmin)/self.svg_xrange * self.x_range + self.xmin
+                # xval = (xval-self.svg_xmin)/self.svg_xrange * self.x_range + self.xmin
+                xval = xval/self.x_range * self.x_range + self.xmin
 
                 s = circle.attrib['fill']
                 # print("s=",s)
@@ -629,7 +668,8 @@ class SubstrateTab(object):
                     print("bogus xval=", xval)
                     break
                 yval = float(circle.attrib['cy'])
-                yval = (yval - self.svg_xmin)/self.svg_xrange * self.y_range + self.ymin
+                # yval = (yval - self.svg_xmin)/self.svg_xrange * self.y_range + self.ymin
+                yval = yval/self.y_range * self.y_range + self.ymin
                 if (np.fabs(yval) > too_large_val):
                     print("bogus xval=", xval)
                     break
@@ -748,7 +788,8 @@ class SubstrateTab(object):
         # if (self.substrates_toggle.value and (frame % self.modulo == 0)):
         if (self.substrates_toggle.value):
             # self.fig = plt.figure(figsize=(14, 15.6))
-            self.fig = plt.figure(figsize=(15.0, 12.5))
+            # self.fig = plt.figure(figsize=(15.0, 12.5))
+            self.fig = plt.figure(figsize=(self.figsize_width_substrate, self.figsize_height_substrate))
             self.substrate_frame = int(frame / self.modulo)
             # print("plot_substrate(): self.substrate_frame=",self.substrate_frame)        
 
@@ -825,14 +866,14 @@ class SubstrateTab(object):
                 fname = os.path.join(self.output_dir, "config.xml")
                 tree = ET.parse(fname)
                 xml_root = tree.getroot()
-                xmin = float(xml_root.find(".//x_min").text)
-                xmax = float(xml_root.find(".//x_max").text)
+                self.xmin = float(xml_root.find(".//x_min").text)
+                self.xmax = float(xml_root.find(".//x_max").text)
                 dx = float(xml_root.find(".//dx").text)
-                ymin = float(xml_root.find(".//y_min").text)
-                ymax = float(xml_root.find(".//y_max").text)
+                self.ymin = float(xml_root.find(".//y_min").text)
+                self.ymax = float(xml_root.find(".//y_max").text)
                 dy = float(xml_root.find(".//dy").text)
-                self.numx =  math.ceil( (xmax - xmin) / dx)
-                self.numy =  math.ceil( (ymax - ymin) / dy)
+                self.numx =  math.ceil( (self.xmax - self.xmin) / dx)
+                self.numy =  math.ceil( (self.ymax - self.ymin) / dy)
 
             xgrid = M[0, :].reshape(self.numy, self.numx)
             ygrid = M[1, :].reshape(self.numy, self.numx)
@@ -889,7 +930,8 @@ class SubstrateTab(object):
         # Now plot the cells (possibly on top of the substrate)
         if (self.cells_toggle.value):
             if (not self.substrates_toggle.value):
-                self.fig = plt.figure(figsize=(12, 12))
+                # self.fig = plt.figure(figsize=(12, 12))
+                self.fig = plt.figure(figsize=(self.figsize_width_svg, self.figsize_height_svg))
             # self.plot_svg(frame)
             self.svg_frame = frame
             # print('plot_svg with frame=',self.svg_frame)

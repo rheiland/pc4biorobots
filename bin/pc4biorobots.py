@@ -85,7 +85,8 @@ def read_config_cb(_b):
     else:  # may want to distinguish "DEFAULT" from other saved .xml config files
         # FIXME: really need a call to clear the visualizations
         # svg.update('')
-        sub.update('')
+        # sub.update('')
+        sub.update()
         
 
 # Using the param values in the GUI, write a new .xml config file
@@ -238,6 +239,7 @@ def run_sim_func(s):
     tdir = os.path.abspath('tmpdir')
     os.chdir(tdir)  # operate from tmpdir; temporary output goes here.  may be copied to cache later
     # svg.update(tdir)
+    sub.update_params(config_tab)
     sub.update(tdir)
 
     if nanoHUB_flag:
@@ -262,7 +264,8 @@ def outcb(s):
     if "simulat" in s:
         # New Data. update visualizations
         # svg.update('')
-        sub.update('')
+        # sub.update('')
+        sub.update()
     return s
 
 
@@ -365,4 +368,4 @@ output_dir = "tmpdir"
 
 # print('config_tab.svg_interval.value= ',config_tab.svg_interval.value )
 # print('config_tab.mcds_interval.value= ',config_tab.mcds_interval.value )
-sub.update(output_dir)
+#sub.update_params(config_tab)
