@@ -26,7 +26,7 @@ class ConfigTab(object):
 #        label_domain = Label('Domain ($\mu M$):')
         label_domain = Label('Domain (micron):')
         stepsize = 10
-        disable_domain = True
+        disable_domain = False
         self.xmin = FloatText(step=stepsize,
             # description='$X_{min}$',
             description='Xmin',
