@@ -402,6 +402,9 @@ class SubstrateTab(object):
         self.ymax = config_tab.ymax.value 
         self.y_range = self.ymax - self.ymin
 
+        self.numx =  math.ceil( (self.xmax - self.xmin) / config_tab.xdelta.value)
+        self.numy =  math.ceil( (self.ymax - self.ymin) / config_tab.ydelta.value)
+
         if (self.x_range > self.y_range):  
             ratio = self.y_range / self.x_range
             self.figsize_width_substrate = 15.0  # allow extra for colormap
@@ -861,19 +864,19 @@ class SubstrateTab(object):
             #     ax.grid(False)
 
             # print("substrates.py: ------- numx, numy = ", self.numx, self.numy )
-            if (self.numx == 0):   # need to parse vals from the config.xml
-                # print("--- plot_substrate(): full_fname=",full_fname)
-                fname = os.path.join(self.output_dir, "config.xml")
-                tree = ET.parse(fname)
-                xml_root = tree.getroot()
-                self.xmin = float(xml_root.find(".//x_min").text)
-                self.xmax = float(xml_root.find(".//x_max").text)
-                dx = float(xml_root.find(".//dx").text)
-                self.ymin = float(xml_root.find(".//y_min").text)
-                self.ymax = float(xml_root.find(".//y_max").text)
-                dy = float(xml_root.find(".//dy").text)
-                self.numx =  math.ceil( (self.xmax - self.xmin) / dx)
-                self.numy =  math.ceil( (self.ymax - self.ymin) / dy)
+            # if (self.numx == 0):   # need to parse vals from the config.xml
+            #     # print("--- plot_substrate(): full_fname=",full_fname)
+            #     fname = os.path.join(self.output_dir, "config.xml")
+            #     tree = ET.parse(fname)
+            #     xml_root = tree.getroot()
+            #     self.xmin = float(xml_root.find(".//x_min").text)
+            #     self.xmax = float(xml_root.find(".//x_max").text)
+            #     dx = float(xml_root.find(".//dx").text)
+            #     self.ymin = float(xml_root.find(".//y_min").text)
+            #     self.ymax = float(xml_root.find(".//y_max").text)
+            #     dy = float(xml_root.find(".//dy").text)
+            #     self.numx =  math.ceil( (self.xmax - self.xmin) / dx)
+            #     self.numy =  math.ceil( (self.ymax - self.ymin) / dy)
 
             xgrid = M[0, :].reshape(self.numy, self.numx)
             ygrid = M[1, :].reshape(self.numy, self.numx)

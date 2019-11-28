@@ -51,6 +51,7 @@ if( 'HOME' in os.environ.keys() ):
     nanoHUB_flag = "home/nanohub" in os.environ['HOME']
 
 
+# callback when user selects a cached run in the 'Load Config' dropdown widget
 def read_config_cb(_b):
     # with debug_view:
     #     print("read_config_cb", read_config.value)
@@ -81,11 +82,13 @@ def read_config_cb(_b):
     # update visualization tabs
     if is_dir:
         # svg.update(read_config.value)
+        sub.update_params(config_tab)
         sub.update(read_config.value)
     else:  # may want to distinguish "DEFAULT" from other saved .xml config files
         # FIXME: really need a call to clear the visualizations
         # svg.update('')
         # sub.update('')
+        sub.update_params(config_tab)
         sub.update()
         
 
