@@ -51,7 +51,9 @@ if( 'HOME' in os.environ.keys() ):
     nanoHUB_flag = "home/nanohub" in os.environ['HOME']
 
 
-# callback when user selects a cached run in the 'Load Config' dropdown widget
+# callback when user selects a cached run in the 'Load Config' dropdown widget.
+# HOWEVER, beware if/when this is called after a sim finishes and the Load Config dropdown widget reverts to 'DEFAULT'.
+# In that case, we don't want to recompute substrate.py self.numx, self.numy because we're still displaying plots from previous sim.
 def read_config_cb(_b):
     # with debug_view:
     #     print("read_config_cb", read_config.value)
@@ -61,18 +63,21 @@ def read_config_cb(_b):
     if read_config.value is None:  #occurs when a Run just finishes and we update pulldown with the new cache dir??
         # with debug_view:
         #     print("NOTE: read_config_cb(): No read_config.value. Returning!")
+        # print("NOTE: read_config_cb(): No read_config.value. Returning!")
         return
 
     if os.path.isdir(read_config.value):
         is_dir = True
         config_file = os.path.join(read_config.value, 'config.xml')
+        # print("read_config_cb(): is_dir=True; config_file=",config_file)
     else:
         is_dir = False
         config_file = read_config.value
+        # print("read_config_cb(): is_dir=False; --- config_file=",config_file)
 
     if Path(config_file).is_file():
         # with debug_view:
-        # print("read_config_cb:  calling fill_gui_params with ",config_file)
+        # print("read_config_cb():  calling fill_gui_params with ",config_file)
         fill_gui_params(config_file)  #should verify file exists!
     else:
         # with debug_view:
@@ -82,14 +87,18 @@ def read_config_cb(_b):
     # update visualization tabs
     if is_dir:
         # svg.update(read_config.value)
+        # print("read_config_cb():  is_dir True, calling update_params")
         sub.update_params(config_tab)
         sub.update(read_config.value)
-    else:  # may want to distinguish "DEFAULT" from other saved .xml config files
+    # else:  # may want to distinguish "DEFAULT" from other saved .xml config files
         # FIXME: really need a call to clear the visualizations
         # svg.update('')
         # sub.update('')
-        sub.update_params(config_tab)
-        sub.update()
+        # print("read_config_cb():  is_dir False, calling update_params")
+        # sub.update_params(config_tab)
+        # print("read_config_cb():  is_dir False, calling sub.update()")
+        # sub.update()  # NOTE: even if we attempt this, it doesn't really refresh the plots
+        # pass
         
 
 # Using the param values in the GUI, write a new .xml config file
@@ -104,21 +113,22 @@ def write_config_file(name):
     tree.write(name)
 
     # update substrate mesh layout (beware of https://docs.python.org/3/library/functions.html#round)
-    sub.numx =  math.ceil( (config_tab.xmax.value - config_tab.xmin.value) / config_tab.xdelta.value )
-    sub.numy =  math.ceil( (config_tab.ymax.value - config_tab.ymin.value) / config_tab.ydelta.value )
-    # print("------- sub.numx, sub.numy = ", sub.numx, sub.numy)
+    sub.update_params(config_tab)
+    # sub.numx =  math.ceil( (config_tab.xmax.value - config_tab.xmin.value) / config_tab.xdelta.value )
+    # sub.numy =  math.ceil( (config_tab.ymax.value - config_tab.ymin.value) / config_tab.ydelta.value )
+    # print("pc4biorobots.py: ------- sub.numx, sub.numy = ", sub.numx, sub.numy)
 
 
 # callback from write_config_button
-def write_config_file_cb(b):
-    path_to_share = os.path.join('~', '.local','share','pc4biorobots')
-    dirname = os.path.expanduser(path_to_share)
+# def write_config_file_cb(b):
+#     path_to_share = os.path.join('~', '.local','share','pc4biorobots')
+#     dirname = os.path.expanduser(path_to_share)
 
-    val = write_config_box.value
-    if val == '':
-        val = write_config_box.placeholder
-    name = os.path.join(dirname, val)
-    write_config_file(name)
+#     val = write_config_box.value
+#     if val == '':
+#         val = write_config_box.placeholder
+#     name = os.path.join(dirname, val)
+#     write_config_file(name)
 
 
 # Fill the "Load Config" dropdown widget with valid cached results (and 
@@ -242,7 +252,7 @@ def run_sim_func(s):
     tdir = os.path.abspath('tmpdir')
     os.chdir(tdir)  # operate from tmpdir; temporary output goes here.  may be copied to cache later
     # svg.update(tdir)
-    sub.update_params(config_tab)
+    # sub.update_params(config_tab)
     sub.update(tdir)
 
     if nanoHUB_flag:
@@ -268,6 +278,7 @@ def outcb(s):
         # New Data. update visualizations
         # svg.update('')
         # sub.update('')
+        # sub.update_params(config_tab)
         sub.update()
     return s
 
@@ -300,6 +311,7 @@ def run_button_cb(s):
     tdir = os.path.abspath('tmpdir')
     os.chdir(tdir)  # operate from tmpdir; temporary output goes here.  may be copied to cache later
     # svg.update(tdir)
+    # sub.update_params(config_tab)
     sub.update(tdir)
 
     subprocess.Popen(["../bin/myproj", "config.xml"])

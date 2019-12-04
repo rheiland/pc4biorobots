@@ -878,8 +878,14 @@ class SubstrateTab(object):
             #     self.numx =  math.ceil( (self.xmax - self.xmin) / dx)
             #     self.numy =  math.ceil( (self.ymax - self.ymin) / dy)
 
-            xgrid = M[0, :].reshape(self.numy, self.numx)
-            ygrid = M[1, :].reshape(self.numy, self.numx)
+            try:
+                xgrid = M[0, :].reshape(self.numy, self.numx)
+                ygrid = M[1, :].reshape(self.numy, self.numx)
+            except:
+                print("substrates.py: mismatched mesh size for reshape: numx,numy=",self.numx, self.numy)
+                pass
+#                xgrid = M[0, :].reshape(self.numy, self.numx)
+#                ygrid = M[1, :].reshape(self.numy, self.numx)
 
             num_contours = 15
             levels = MaxNLocator(nbins=num_contours).tick_values(self.cmap_min.value, self.cmap_max.value)
