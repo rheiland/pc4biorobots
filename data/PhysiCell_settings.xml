@@ -162,7 +162,7 @@
 		<elastic_coefficient type="double" units="1/min" description="strength of worker-cargo adhesion">0.15</elastic_coefficient>
 
 		<worker_motility_persistence_time type="double" units="min" description="time between direction changes for workers">5.0</worker_motility_persistence_time>
-		<worker_migration_speed type="double" units="micron/min" discription="worker migration speed">5.0</worker_migration_speed>
+		<worker_migration_speed type="double" units="micron/min" description="worker migration speed">5.0</worker_migration_speed>
 		<attached_worker_migration_bias type="double" units="dimensionless" 
 			description="how strictly attached workers follow chemotactic signals">1.0</attached_worker_migration_bias>
 		<unattached_worker_migration_bias type="double" units="dimensionless"
