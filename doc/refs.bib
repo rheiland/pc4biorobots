@@ -1,0 +1,83 @@
+@article{physicell-2018,
+ author="Ghaffarizadeh, Ahmadreza and Heiland, Randy and Friedman, Samuel H and 
+         Mumenthaler, Shannon M and Macklin, Paul",
+ title="{PhysiCell: an open source physics-based cell simulator for 3-D multicellular systems}",
+ journal="PLoS Comput. Biol.",
+ volume="14",
+ number="2",
+ year="2018",
+ pages="e1005991",
+ DOI="10.1371/journal.pcbi.1005991",
+ URL="http://dx.doi.org/10.1371/journal.pcbi.1005991",
+}
+
+@ARTICLE{Ghaffarizadeh2016-ga,
+	title    = "{BioFVM}: an efficient, parallelized diffusive transport solver
+	for {3-D} biological simulations",
+	author   = "Ghaffarizadeh, Ahmadreza and Friedman, Samuel H and Macklin, Paul",
+	abstract = "MOTIVATION: Computational models of multicellular systems require
+	solving systems of PDEs for release, uptake, decay and diffusion
+	of multiple substrates in 3D, particularly when incorporating the
+	impact of drugs, growth substrates and signaling factors on cell
+	receptors and subcellular systems biology. RESULTS: We introduce
+	BioFVM, a diffusive transport solver tailored to biological
+	problems. BioFVM can simulate release and uptake of many
+	substrates by cell and bulk sources, diffusion and decay in large
+	3D domains. It has been parallelized with OpenMP, allowing
+	efficient simulations on desktop workstations or single
+	supercomputer nodes. The code is stable even for large time
+	steps, with linear computational cost scalings. Solutions are
+	first-order accurate in time and second-order accurate in space.
+	The code can be run by itself or as part of a larger simulator.
+	AVAILABILITY AND IMPLEMENTATION: BioFVM is written in C ++ with
+	parallelization in OpenMP. It is maintained and available for
+	download at http://BioFVM.MathCancer.org and http://BioFVM.sf.net
+	under the Apache License (v2.0). CONTACT: paul.macklin@usc.edu
+	SUPPLEMENTARY INFORMATION: Supplementary data are available at
+	Bioinformatics online.",
+	journal  = "Bioinformatics",
+	volume   =  32,
+	number   =  8,
+	pages    = "1256--1258",
+	month    =  apr,
+	year     =  2016,
+	url      = "http://dx.doi.org/10.1093/bioinformatics/btv730",
+	language = "en"
+}
+@ARTICLE{Heiland2019-wo,
+  title    = "xml2jupyter: Mapping parameters between {XML} and Jupyter widgets",
+  author   = "Heiland, Randy and Mishler, Daniel and Zhang, Tyler and Bower,
+              Eric and Macklin, Paul",
+  abstract = "Jupyter Notebooks (Kluyver et al., 2016, Perkel (2018)) provide
+              executable documents (in a variety of programming languages) that
+              can be run in a web browser. When a notebook contains graphical
+              widgets, it becomes an easy-to-use graphical user interface
+              (GUI). Many scientific simulation packages use text-based
+              configuration files to provide parameter values and run at the
+              command line without a graphical interface. Manually editing
+              these files to explore how different values affect a simulation
+              can be burdensome for technical users, and impossible to use for
+              those with other scientific backgrounds. xml2jupyter is a Python
+              package that addresses these scientific bottlenecks. It provides
+              a mapping between configuration files, formatted in the
+              Extensible Markup Language (XML), and Jupyter widgets. Widgets
+              are automatically generated from the XML file and these can,
+              optionally, be incorporated into a larger GUI for a simulation
+              package, and optionally hosted on cloud resources. Users modify
+              parameter values via the widgets, and the values are written to
+              the XML configuration file which is input to the simulation's
+              command-line interface. xml2jupyter has been tested using
+              PhysiCell (Ghaffarizadeh, Heiland, Friedman, Mumenthaler, \&
+              Macklin, 2018), an open source, agent-based simulator for
+              biology, and it is being used by students for classroom and
+              research projects. In addition, we use xml2jupyter to help create
+              Jupyter GUIs for PhysiCell-related applications running on
+              nanoHUB (Madhavan et al., 2013).",
+  journal  = "J Open Source Softw",
+  volume   =  4,
+  number   =  39,
+  month    =  jul,
+  year     =  2019,
+  url      = "http://dx.doi.org/10.21105/joss.01408",
+  language = "en"
+}

@@ -1,0 +1,324 @@
+\documentclass{article}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{amsmath}
+\usepackage{bm}
+\usepackage{commath}
+
+%\usepackage{siunitx}
+\usepackage[margin=0.5in]{geometry}
+\definecolor{darkgreen}{rgb}{0.0, 0.6, 0.0}
+\usepackage[parfill]{parskip}
+
+\bibliographystyle{acm}
+
+\begin{document}
+
+\title{A synthetic multicellular system to deliver a therapeutic "cargo"}
+\date{}
+\author{}
+\maketitle
+
+\section{Introduction}
+This app demonstrates how simple ``rules'' for chemical- and contact-based
+communication could be used for \emph{active} delivery of therapeutic
+compounds, while overcoming traditional biotransport limits and using
+hypoxia to target delivery. It is based on a published PhysiCell example
+in Ghaffarizadeh et al.\cite{physicell-2018}. In this model, \textcolor{darkgreen}{cancer cells
+(green)} rapidly divide while consuming oxygen, which drives the
+emergence of hypoxic gradients. Greater availability of oxygen drives
+faster proliferation, while low oxygen can trigger necrotic death,
+creating a necrotic core ({brown cells}) in the center of the tumor.
+After initial growth, we "inject" a multicellular synthetic therapy.
+
+In this (for now theoretical) synthetic therapy, \textcolor{red}{"worker cells" (red)}
+search for \textcolor{blue}{"cargo cells" (blue)}, form focal adhesions, and haul their
+cargo towards hypoxic (oxygen-depleted) regions in the tissue. Once they
+reach a region of sufficiently low oxygen, they release their cargo and
+resume their initial search for more cargo. Released cargo cells secrete
+a chemotherapeutic compound that can kill nearby tumor cells. (Cancer
+cells are shaded according to their level of therapy-induced damage.)
+
+This model and cloud-hosted demo are part of a course on computational
+multicellular systems biology created and taught by Dr. Paul Macklin in
+the Department of Intelligent Systems Engineering at Indiana University.
+It is also part of the education and outreach for the NSF-funded IU Engineered
+nanoBIO Node and the NCI-funded cancer systems biology grants.
+The models are built using
+\href{https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1005991}{PhysiCell}:
+a C++ framework for multicellular systems biology.
+
+\section{Chemical components}
+All chemical signals move by chemical diffusion in the simulated
+environment, using
+\href{http://dx.doi.org/10.1093/bioinformatics/btv730}{BioFVM}\cite{Ghaffarizadeh2016-ga}
+to solve the reaction-diffusion equations. A key property is the
+\emph{diffusion length scale}. Diffusion (with a diffusion coefficient
+\emph{D}) helps spread a signal over large distances, while decay (and
+uptake) (with coefficient $\lambda$) eliminates the signal to slow its
+spread. These effects compete to determine the characteristic distance
+\emph{L} that a chemical signal travels.
+
+That length scale, \emph{L}, is given by \emph{L} = sqrt( \emph{D}/$\lambda$).
+
+%Choosing \emph{D} and \emph{λ} can help to tune the chemical
+Choosing \emph{D} and $\lambda$ can help to tune the chemical
+communication distance in these models.
+
+\subsection{Oxygen ($\sigma$)}
+%(\emph{σ}):}{Oxygen (σ):}}\label{oxygen-ux3c3}}
+
+This is released by the computational boundary (a simplified model of a
+far-field vasculature), and consumed by tumor cells.
+We use a far-field value of 38 mmHg (about 5\%), which is a typical
+physioxic condition. See \cite{Ghaffarizadeh2016-ga} and \cite{physicell-2018} for more references. We use a
+%length scale of 1000 μm, and cancer cell uptake gives a length scale of
+length scale of 1000~$\mu$m, and cancer cell uptake gives a length scale of
+100~$\mu$m  in densely packed regions.
+
+\subsection{Chemoattractant (\emph{a}):}
+
+This factor is released by undocked cargo cells to help guide chemotaxis
+by worker cells.
+
+The chemoattractant is nondimensionalized so that $0 \leq \emph{a} \leq 1$, and
+we initially assign a length scale of 100~$\mu$m.
+
+\subsection{Chemotherapeutic (\emph{c}):}
+This factor is released by released cargo cells to kill cancer cells.
+
+The therapeutic is nondimensionalized so that $0 \leq \emph{c} \leq 1$, and we
+initially assign a length scale of 80~$\mu$m.
+
+\section{Cell agents}
+We use agent-based models to explore multicellular systems like this
+one. Each cell is modeled as a software agent with an independent state,
+and its own rules to change its behavior based on local environmental
+conditions and communication. We use PhysiCell as our modeling platform
+{[}1{]}.~
+
+\subsection{Key features in the agent-based
+models}
+
+\paragraph{Birth and death:}\label{birth-and-death}
+
+Cells can proliferate (divide into two daughter cells of half size),
+with division rates regulated by cell rules. In our model, cells
+continuously work to grow towards a "target" mature volume.
+
+Note that birth and death are stochastic events for each cell agent: if
+such a process occurs at rate \emph{r}, then between now (\emph{t}) and
+soon (\emph{t} + $\Delta$\emph{t}), the probability of the event occurring for
+that agent is \emph{r}$\Delta$\emph{t}.
+
+\paragraph{Secretion and uptake:}\label{secretion-and-uptake}
+
+Cells can secrete chemical factors, or they can remove them (i.e.,
+consume or uptake). This can contribute to gradients in chemical
+factors, and it's a key method of communication between cells. Moreover,
+cells can "sample" the chemical state of their surrounding environment.
+Secreting is sending a signal. Uptaking and sampling is receiving a
+signal.
+
+\paragraph{Biased migration:}\label{biased-migration}
+
+Motile cells perform \emph{biased migration}. After traveling for
+\emph{T}\textsubscript{persistence} time (the mean persistence time),
+they choose a new migration direction $\mathbf{d}_{migrate}$. Based
+on the environmental conditions, the cell chooses a directional bias
+(intended direction) $\mathbf{d}_{bias}$ and a random unit vector
+$\mathbf{r}$. The motile direction $\mathbf{d}_{migrate}$ is then determined
+by according to:
+
+%{d}\textsubscript{migrate} = b {d}\textsubscript{bias} + (1-b) {r}.
+\begin{center}
+$\mathbf{d}_{migrate} = b \: \mathbf{d}_{bias} + (1-b) \mathbf{r}$.
+\end{center}
+
+Here, \emph{b} is a \emph{bias} parameter (between 0 and 1) that
+determines how strongly biased migration is towards
+$\mathbf{d}_{bias}$. If \emph{b} =1, then migration is deterministic
+towards $\mathbf{d}_{bias}$. If \emph{b} = 0, then migration is
+completely random (Brownian).
+
+Once the migration direction is chosen, it is normalized, and multiplied
+by the cell's migration speed.
+
+\paragraph{Mechanics:}\label{mechanics}
+
+Cell agents can stick to one another within a prescribed interaction
+distance (some multiple of their radius), and they can exert a pushing
+force on neighbors. PhysiCell {[}1{]} uses potential functions to
+implement these simple mechanics. Notably, PhysiCell is an off-lattice
+model, meaning that cells can have variable sizes, and can move freely
+without grid artifacts.
+
+They aren't required to move some prescribed number of spatial steps.
+They also can divide without checking for an open neighbor "site".
+Instead, they can divide and push their neighbors out of the way.~
+
+\paragraph{Focal adhesions:}
+
+PhysiCell allows custom functions for any cell agents. We use this to
+model focal cell-cell adhesions as spring-like forces. If two cells
+\emph{i} and \emph{j} (with positions $\mathbf{x}_{i}$ and
+$\mathbf{x}_{j}$) have a focal adhesion, then cell \emph{i} is
+adhered to cell \emph{j} with a spring-like force that we model as:
+
+\begin{center}
+$\mathbf{F}_{ij} = \varepsilon (\mathbf{x}_{j} -
+\mathbf{x}_{i})$,
+\end{center}
+
+where $\varepsilon$ is the elastic coefficient. Because PhysiCell has an
+inertialess formatulation (see the method paper in {[}1{]}), this is
+added directly to the cell's velocity, and so $\varepsilon$ has units
+min\textsuperscript{-1}. To model the finite deformability of cells and
+these elastic focal adhesions, we detach the cells if their distance
+($\norm{\mathbf{x}_{i} - \mathbf{x}_{j}}$) 
+exceeds a set maximum distance $r_{max}$.
+
+\subsubsection{Worker cells (\textcolor{red}{red})}
+%({red})}{Worker cells (red)}}\label{worker-cells-red}
+
+Worker cells do not divide, but they can be assigned an apoptotic death
+rate to model normal "wear and tear." We model workers as non-adhesive
+except by spring-like focal adhesions; see
+\protect\hyperlink{focal_adhesions}{focal adhesions}. They are made more
+"repulsive" (by default, fivefold more repulsive) to allow them to more
+readily move through dense cellular regions. Worker cells consume
+oxygen, but at a reduced rate (by default, 10\% of the rate of cancer
+cells).
+
+{Unattached} worker cells use the following as their migration bias
+direction:~
+
+\begin{center}
+$\mathbf{d}_{bias} = \nabla a$,
+\end{center}
+
+where \emph{a} is the chemoattractant released by unattached cargo
+cells. Note that $\nabla$ is the gradient operator that points towards higher
+concentrations of a chemical factor.
+
+Unattached worker cells test for near contact with unattached cargo
+cells. If they detect an unattached cargo cell with active receptor
+\emph{R} (\emph{R} $\approx$ 1), they form a focal adhesion (see
+\protect\hyperlink{focal_adhesions}{focal adhesions}).
+
+{Attached} worker cells change their migration bias direction to:
+
+\begin{center}
+$\mathbf{d}_{bias} = - \nabla \sigma$,
+\end{center}
+
+where $\sigma$ is the oxygen.
+
+\subsubsection{Cargo cells (\textcolor{blue}{blue})}\label{cargo-cells-blue}
+
+Cargo cells do not divide, but they can be assigned an apoptotic death
+rate to model normal "wear and tear." We model cargo as non-adhesive
+except by spring-like focal adhesions; see
+\protect\hyperlink{focal_adhesions}{focal adhesions}. They are made more
+"repulsive" (by default, fivefold more repulsive) to allow them to more
+readily move through dense cellular regions. Cargo cells consume oxygen,
+but at a reduced rate (by default, 10\% of the rate of cancer cells).
+Note that all cargo cells are non-motile.
+
+Initially, all cargo cells express a receptor \emph{R} with
+dimensionless value 1, which is used to control their chemical
+secretions. If \emph{R} = 1, they secrete chemoattractant \emph{a} to
+help guide worker cells. If \emph{R} = 0 and they are unattached, then
+they secrete the therapeutic \emph{c}.
+
+Cargo cells permanently deactivate their receptor (set \emph{R} = 0)
+once they are attached to a worker cell. They detach from worker cells
+if $\sigma < \sigma_{release}$.
+
+\subsubsection{Cancer cells (\textcolor{darkgreen}{green})}\label{cancer-cells-green}
+
+Cancer cells divide at a rate proportional to oxygen availability, and
+they experience necrotic death at a rate that increases as oxygen
+decreases. We use the default parameter values from {[}1{]} for this
+sample model; they cannot be adjusted by users in the current demo
+version. Note that all cancer cells are non-motile in this example.
+
+Beyond oxygen-driven birth and hypoxia-driven death, cancer cells are
+have a basic damage-repair model. Exposure to the chemotherapeutic
+compound \emph{c} causes damage ($\omega$, which can be repaired. We
+simulate this as
+
+\begin{center}
+$\frac{d\omega}{dt} = r_{damage} \: c - r_{repair} \: \omega$
+\end{center}
+
+where \emph{c} is sampled at the cell's position. Cancer cells increase
+their apoptotic death rate by their therapeutic death rate
+\emph{d}\textsubscript{therapy}, which we model as
+
+\begin{center}
+$d_{therapy} = \frac{\omega}{\omega_{max}} \: d_{max}$,
+\end{center}
+
+where \emph{d}\textsubscript{max} is the maximum death rate that is
+reach when damage ($\omega$) reaches \emph{ω}\textsubscript{max}.
+
+In this model, we set $\omega_{max}$ by solving the damage
+model to find the steady state damage at a maximum value of \emph{c}
+(which is 1):
+
+\begin{center}
+$\omega_{max} = r_{damage} / r_{repair}$
+\end{center}
+
+\subsection{Basic
+instructions}\label{basic-instructions}
+
+Modify the parameters in the "Config Basics" and "User Params" tabs
+and click the "Run" button.
+
+To view simulation results, click the "Out: Plots" tab, and slide the bar to
+advance through simulation frames. Note that as the simulation runs, the
+"\# frames" field will increase, so you can view more
+simulation frames.
+
+Note that you can download full simulation data for further exploration
+in your tools of choice.
+
+\section{Additional information}
+To learn more about our work, please visit \href{http://mathCancer.org}{MathCancer.org}.
+
+Credits:
+
+Scientific Staff:
+Randy Heiland, Research Associate, Intelligent Systems Engineering, Indiana University.
+\begin{itemize}
+\item Lead software architect:
+\end{itemize}
+
+Paul Macklin, Ph.D. , Associate Professor, Intelligent Systems Engineering, Indiana University.
+\begin{itemize}
+\item Scientific lead, developed PhysiCell simulation model:
+\end{itemize}
+
+The following undergraduate students have contributed to this project:
+
+Jupyter notebook and UI development:
+\begin{itemize}
+\item Eric Bower (IU Intelligent Systems Engineering, B.S., 2018-present)
+\item Daniel Mishler (IU Intelligent Systems Engineering, B.S., 2018-present)
+\item Tyler Zhang (IU Intelligent Systems Engineering, B.S., 2018)
+\end{itemize}
+
+
+\section{Sponsored by}
+\begin{itemize}
+\item NSF EEC-1720625. Network for Computational Nanotechnology - Engineered nanoBIO Node
+\item Breast Cancer Research Foundation 
+\item Jayne Koskinas Ted Giovanis Foundation for Health and Policy
+\item NIH U01CA232137
+\end{itemize}
+%\clearpage
+\bibliography{refs}
+\end{document}
